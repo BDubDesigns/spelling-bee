@@ -1,0 +1,37 @@
+{
+  "name": "@spelling-bee/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express API server for the Spelling Bee application",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@clerk/express": "^1.6.0",
+    "@spelling-bee/shared": "*",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.0",
+    "helmet": "^8.1.0",
+    "express-rate-limit": "^7.5.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0",
+    "@types/supertest": "^6.0.0",
+    "supertest": "^7.1.0"
+  }
+}
