@@ -2,7 +2,7 @@ import { Router } from "express";
 import { generatePuzzle, getDailyDate, validateSubmission, submitScore, getUserScore } from "@/services";
 import { PuzzleModel } from "@/models";
 import { NotFoundError, ValidationError } from "@/errors";
-import { createSuccessResponse } from "@spelling-bee/shared";
+import { createSuccessResponse, createErrorResponse } from "@spelling-bee/shared";
 import type { DictionaryDifficulty } from "@/services";
 import type { Puzzle } from "@spelling-bee/shared";
 
@@ -87,7 +87,8 @@ router.post("/submit", async (req, res, next) => {
     const result = validateSubmission(word, puzzle as unknown as Puzzle, foundWords, "medium");
 
     if (!result.valid) {
-      res.status(400).json(createSuccessResponse(result));
+      // Return error response (success: false) so client can handle it properly
+      res.status(400).json(createErrorResponse("VALIDATION_ERROR", result.message));
       return;
     }
 
@@ -106,7 +107,7 @@ router.post("/submit", async (req, res, next) => {
       puzzle.maxScore,
     );
 
-    res.json(createSuccessResponse({ ...result, score }));
+    res.json(createSuccessResponse({ result, score }));
   } catch (err) {
     next(err);
   }
