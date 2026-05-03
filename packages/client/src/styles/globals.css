@@ -1,1 +1,88 @@
 @import "tailwindcss";
+
+@theme {
+  /* Spelling Bee brand colors */
+  --color-bee-yellow: #f7da21;
+  --color-bee-yellow-light: #fef3c7;
+  --color-bee-yellow-dark: #ca8a04;
+  --color-bee-honey: #d97706;
+  --color-bee-brown: #78350f;
+  --color-bee-cream: #fffbeb;
+
+  /* Game state colors */
+  --color-correct: #22c55e;
+  --color-pangram: #f59e0b;
+  --color-error: #ef4444;
+  --color-muted: #94a3b8;
+
+  /* Typography */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+
+  /* Animations */
+  --animate-shake: shake 0.5s ease-in-out;
+  --animate-pop: pop 0.3s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-bee-cream);
+  color: var(--color-bee-brown);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Game input styling */
+.game-input {
+  font-family: var(--font-mono);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* Hexagon hover effect */
+.hex-cell {
+  transition: transform 0.15s ease, filter 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hex-cell:hover {
+  transform: scale(1.08);
+  filter: brightness(1.05);
+}
+
+.hex-cell:active {
+  transform: scale(0.95);
+}
+
+/* Found word animation */
+.word-found {
+  animation: pop 0.3s ease-out;
+}
+
+/* Error shake animation */
+.word-error {
+  animation: shake 0.5s ease-in-out;
+}
