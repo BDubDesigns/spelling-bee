@@ -4,7 +4,7 @@ import helmet from "helmet";
 import mongoose from "mongoose";
 import { config } from "@/config";
 import { errorHandler } from "@/middleware";
-import { puzzleRouter, leaderboardRouter } from "@/routes";
+import { puzzleRouter, leaderboardRouter, socialRouter } from "@/routes";
 import { loadAllDictionaries } from "@/services";
 
 /**
@@ -38,6 +38,7 @@ app.get("/api/health", (_req, res) => {
 /** API routes */
 app.use("/api/puzzle", puzzleRouter);
 app.use("/api/leaderboard", leaderboardRouter);
+app.use("/api/social", socialRouter);
 
 /** Centralized error handler (must be last) */
 app.use(errorHandler);
