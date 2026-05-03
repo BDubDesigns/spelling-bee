@@ -76,9 +76,9 @@ describe("createWordScore", () => {
   });
 
   it("creates correct score for actual pangram", () => {
-    // "abeling" uses a,b,e,l,i,n,g — all 7 unique letters
-    const score = createWordScore("abeling", ["a", "b", "e", "l", "i", "n", "g"]);
-    expect(score.word).toBe("abeling");
+    // "belting" uses b,e,l,t,i,n,g — all 7 unique letters
+    const score = createWordScore("belting", ["b", "e", "l", "t", "i", "n", "g"]);
+    expect(score.word).toBe("belting");
     expect(score.points).toBe(14); // 7 + 7 pangram bonus
     expect(score.isPangram).toBe(true);
   });
