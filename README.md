@@ -14,6 +14,7 @@ Spelling Bee is a word puzzle game where players form words from a set of seven 
 - **Leaderboards** — Daily, weekly, and all-time rankings
 - **Friend System** — Add friends, compare scores, send invites
 - **Authentication** — Powered by Clerk
+- **Three Difficulty Levels** — Easy (50), Medium (60), Hard (70) word lists from SCOWL
 
 ## Tech Stack
 
@@ -25,7 +26,7 @@ Spelling Bee is a word puzzle game where players form words from a set of seven 
 | Auth | Clerk |
 | Monorepo | Turborepo, npm workspaces |
 | Validation | Zod (shared SSOT) |
-| Testing | Vitest, React Testing Library, Supertest |
+| Testing | Vitest, React Testing Library |
 
 ## Project Structure
 
@@ -36,6 +37,7 @@ spelling-bee/
 │   ├── server/           # Express API server
 │   └── client/           # React + Vite frontend
 ├── scripts/              # Build tools (dictionary generation)
+├── Dockerfile            # Multi-stage production build
 ├── docker-compose.yml    # Production deployment
 ├── turbo.json            # Turborepo configuration
 └── tsconfig.base.json    # Shared TypeScript configuration
@@ -54,7 +56,7 @@ spelling-bee/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/spelling-bee.git
+git clone https://github.com/BDubDesigns/spelling-bee.git
 cd spelling-bee
 
 # Install dependencies
@@ -63,9 +65,6 @@ npm install
 # Set up environment variables
 cp .env.example .env
 # Edit .env with your Clerk and MongoDB credentials
-
-# Generate the dictionary (requires Python 3 + SQLite)
-# See scripts/build-dictionary.ts for details
 
 # Start development servers
 npm run dev
@@ -76,7 +75,7 @@ npm run dev
 Create a `.env` file in the root directory:
 
 ```env
-# Clerk
+# Clerk (server)
 CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
@@ -85,6 +84,13 @@ MONGODB_URI=mongodb+srv://...
 
 # Server
 PORT=3000
+```
+
+Create a `packages/client/.env` file:
+
+```env
+# Clerk (client)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
 ```
 
 ## Development
@@ -108,6 +114,8 @@ npm run build
 
 ## Deployment
 
+### Docker (Recommended)
+
 The application is designed to be deployed as a single Docker container:
 
 ```bash
@@ -115,12 +123,27 @@ The application is designed to be deployed as a single Docker container:
 docker compose up --build
 ```
 
+### Coolify (Self-hosted)
+
 For production deployment on a VPS with Coolify:
 
 1. Push to your Git repository
 2. Connect Coolify to your repository
-3. Configure environment variables in Coolify
+3. Set the following environment variables in Coolify:
+   - `CLERK_PUBLISHABLE_KEY`
+   - `CLERK_SECRET_KEY`
+   - `MONGODB_URI`
 4. Deploy
+
+### Manual Deployment
+
+```bash
+# Build all packages
+npm run build
+
+# Start the production server
+NODE_ENV=production node packages/server/dist/index.js
+```
 
 ## Architecture
 
@@ -135,15 +158,34 @@ Shared logic (types, validation, utilities) lives in the `shared` package and is
 
 ## Dictionary
 
-The word list is generated from [SCOWL](https://github.com/en-wl/wordlist) (Spell Checker Oriented Word Lists) at size 60, which provides a curated list of common English words. The dictionary is committed to the repository for reproducibility.
+The word list is generated from [SCOWL](https://github.com/en-wl/wordlist) (Spell Checker Oriented Word Lists) at three sizes:
 
-To regenerate the dictionary:
+- **Size 50 (Easy)** — 60,954 common words
+- **Size 60 (Medium)** — 78,351 standard words (default)
+- **Size 70 (Hard)** — 126,398 words including less common ones
+
+The dictionaries are committed to the repository for reproducibility. To regenerate:
 
 ```bash
 # Clone SCOWL to c:\opencode\scowl\
 # Then run the build script
-npx tsx scripts/build-dictionary.ts
+python -X utf8 scripts/generate-dictionaries.py
 ```
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/puzzle/today` | Get today's daily puzzle |
+| GET | `/api/puzzle/:id` | Get a specific puzzle |
+| POST | `/api/puzzle/generate` | Generate a practice puzzle |
+| POST | `/api/puzzle/submit` | Submit a word for validation |
+| GET | `/api/leaderboard/:timeframe` | Get leaderboard (daily/weekly/allTime) |
+| GET | `/api/social/friends` | Get user's friends list |
+| GET | `/api/social/requests` | Get pending friend requests |
+| POST | `/api/social/request` | Send a friend request |
+| POST | `/api/social/respond` | Accept/decline a friend request |
 
 ## License
 
