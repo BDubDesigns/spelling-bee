@@ -1,4 +1,4 @@
-import type { WordScore, ScoreBreakdown } from "@/types";
+import type { WordScore, ScoreBreakdown } from "../types/index";
 
 /**
  * Scoring constants for the Spelling Bee game.

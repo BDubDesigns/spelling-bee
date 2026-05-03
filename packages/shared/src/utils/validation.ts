@@ -1,4 +1,4 @@
-import type { WordValidationResult, ValidationErrorCode } from "@/types";
+import type { WordValidationResult, ValidationErrorCode } from "../types/index";
 import { SCORING } from "./scoring";
 
 /**

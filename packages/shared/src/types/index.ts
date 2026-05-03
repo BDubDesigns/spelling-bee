@@ -1,30 +1,35 @@
 /**
  * TypeScript types inferred from Zod schemas.
  *
- * These types are derived from the schemas in @/schemas to ensure
- * consistency between runtime validation and compile-time types.
- *
- * Import these types for type annotations. Import schemas for runtime validation.
+ * Re-exports all types from the schemas module for convenience.
+ * Import types from here; import schemas for runtime validation.
  */
 
-export type { PuzzleLetters, WordSubmission, ValidationErrorCode, WordValidationResult } from "@/schemas/word";
-
-export type { PuzzleRank, Puzzle } from "@/schemas/puzzle";
-export { DEFAULT_RANK_THRESHOLDS } from "@/schemas/puzzle";
-
-export type { MembershipTier, User, PublicUser } from "@/schemas/user";
-
-export type { WordScore, Score, ScoreBreakdown } from "@/schemas/score";
-
-export type { LeaderboardTimeframe, LeaderboardEntry, Leaderboard } from "@/schemas/leaderboard";
-
 export type {
+  PuzzleLetters,
+  WordSubmission,
+  ValidationErrorCode,
+  WordValidationResult,
+  PuzzleRank,
+  Puzzle,
+  MembershipTier,
+  User,
+  PublicUser,
+  WordScore,
+  Score,
+  ScoreBreakdown,
+  LeaderboardTimeframe,
+  LeaderboardEntry,
+  Leaderboard,
   FriendRequestStatus,
   Friendship,
   FriendInvite,
   SendFriendRequest,
   RespondToFriendRequest,
-} from "@/schemas/social";
+  ApiErrorCode,
+  ApiSuccessResponse,
+  ApiErrorResponse,
+  ApiResponse,
+} from "../schemas/index";
 
-export type { ApiErrorCode, ApiSuccessResponse, ApiErrorResponse, ApiResponse } from "@/schemas/api";
-export { createSuccessResponse, createErrorResponse } from "@/schemas/api";
+export { DEFAULT_RANK_THRESHOLDS, createSuccessResponse, createErrorResponse } from "../schemas/index";
