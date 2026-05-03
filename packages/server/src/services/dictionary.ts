@@ -100,3 +100,23 @@ export const findWordsByPrefix = (
   const trie = getDictionary(difficulty);
   return trie.findByPrefix(prefix);
 };
+
+/**
+ * Finds all words using only the allowed letters.
+ *
+ * This is the efficient way to find Spelling Bee candidate words.
+ * Uses the trie's prefix pruning to skip invalid branches.
+ *
+ * @param allowedLetters - Set of letters that can be used
+ * @param minLength - Minimum word length
+ * @param difficulty - The dictionary to search
+ * @returns Array of valid words
+ */
+export const findWordsByLetters = (
+  allowedLetters: Set<string>,
+  minLength = 4,
+  difficulty: DictionaryDifficulty = "medium",
+): string[] => {
+  const trie = getDictionary(difficulty);
+  return trie.findByLetters(allowedLetters, minLength);
+};

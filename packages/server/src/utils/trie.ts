@@ -121,6 +121,54 @@ export class Trie {
   }
 
   /**
+   * Finds all words that use only the allowed letters.
+   *
+   * This is the efficient way to query the trie for Spelling Bee puzzles.
+   * Instead of fetching all words and filtering (O(n*m)), we prune branches
+   * during traversal, skipping any node whose letter isn't in the allowed set.
+   *
+   * @param allowedLetters - Set of letters that can be used
+   * @param minLength - Minimum word length (default: 4)
+   * @returns Array of valid words
+   */
+  findByLetters(allowedLetters: Set<string>, minLength = 4): string[] {
+    const words: string[] = [];
+    this.findWordsRecursive(this.root, "", allowedLetters, minLength, words);
+    return words;
+  }
+
+  /**
+   * Recursively finds words using only allowed letters.
+   *
+   * Prunes entire subtrees when a letter isn't in the allowed set,
+   * making this dramatically faster than flat-list filtering.
+   *
+   * @param node - Current trie node
+   * @param prefix - Characters built so far
+   * @param allowedLetters - Set of valid letters
+   * @param minLength - Minimum word length
+   * @param words - Accumulator for found words
+   */
+  private findWordsRecursive(
+    node: TrieNode,
+    prefix: string,
+    allowedLetters: Set<string>,
+    minLength: number,
+    words: string[],
+  ): void {
+    if (node.isEndOfWord && prefix.length >= minLength) {
+      words.push(prefix);
+    }
+
+    for (const [char, child] of node.children) {
+      // Prune: skip branches with letters not in the allowed set
+      if (allowedLetters.has(char)) {
+        this.findWordsRecursive(child, prefix + char, allowedLetters, minLength, words);
+      }
+    }
+  }
+
+  /**
    * Returns the number of words in the trie.
    */
   get size(): number {

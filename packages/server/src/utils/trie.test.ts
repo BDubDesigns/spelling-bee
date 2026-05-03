@@ -96,4 +96,50 @@ describe("Trie", () => {
       expect(prePopulated.size).toBe(3);
     });
   });
+
+  describe("findByLetters", () => {
+    it("finds words using only allowed letters", () => {
+      // Trie has: apple, app, banana, band, bat
+      // With letters {a, p, l, e} and minLength 3, should find: app, apple
+      const result = trie.findByLetters(new Set(["a", "p", "l", "e"]), 3);
+      expect(result).toContain("app");
+      expect(result).toContain("apple");
+      expect(result).not.toContain("banana"); // uses b, n
+    });
+
+    it("prunes branches with invalid letters", () => {
+      // With letters {a, b, t} and minLength 3, should find: bat
+      // Should NOT traverse into "ban" branch (needs n) or "app" branch (needs p)
+      const result = trie.findByLetters(new Set(["a", "b", "t"]), 3);
+      expect(result).toContain("bat");
+      expect(result).not.toContain("band"); // needs n
+      expect(result).not.toContain("app"); // needs p
+    });
+
+    it("respects minimum length", () => {
+      // With letters {a, p, l, e} and minLength 5, should find: apple only
+      const result = trie.findByLetters(new Set(["a", "p", "l", "e"]), 5);
+      expect(result).toContain("apple");
+      expect(result).not.toContain("app"); // too short
+    });
+
+    it("returns empty array when no words match", () => {
+      const result = trie.findByLetters(new Set(["z", "x", "y"]));
+      expect(result).toEqual([]);
+    });
+
+    it("finds all words when all letters allowed", () => {
+      // Trie has: apple, app, banana, band, bat
+      // "band" uses "d" which is not in the set, so only 4 words match
+      const result = trie.findByLetters(
+        new Set(["a", "p", "l", "e", "b", "n", "t"]),
+        3,
+      );
+      expect(result).toHaveLength(4);
+      expect(result).toContain("app");
+      expect(result).toContain("apple");
+      expect(result).toContain("banana");
+      expect(result).toContain("bat");
+    });
+  });
 });

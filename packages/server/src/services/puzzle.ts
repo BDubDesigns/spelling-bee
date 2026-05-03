@@ -68,9 +68,9 @@ const selectLetters = (
 
     // Verify at least one pangram exists using these letters
     const letterSet = new Set(selected);
-    const allWords = trie.findByPrefix("");
-    const pangrams = allWords.filter(
-      (w) => w.length >= 7 && new Set(w).size === 7 && [...w].every((c) => letterSet.has(c)),
+    const candidateWords = trie.findByLetters(letterSet, 7);
+    const pangrams = candidateWords.filter(
+      (w) => new Set(w).size === 7,
     );
 
     if (pangrams.length > 0 && selected.length === 7) {
@@ -93,6 +93,9 @@ const selectLetters = (
 /**
  * Finds all valid words for a given puzzle.
  *
+ * Uses the trie's findByLetters to efficiently traverse only branches
+ * with valid letters, then filters for center letter inclusion.
+ *
  * @param letters - The 7 available letters
  * @param centerLetter - The required center letter
  * @param trie - Dictionary trie
@@ -104,13 +107,10 @@ const findValidWords = (
   trie: ReturnType<typeof getDictionary>,
 ): string[] => {
   const letterSet = new Set(letters);
-  const allWords = trie.findByPrefix("");
-
-  return allWords.filter((word) => {
-    if (word.length < 4) return false;
-    if (!word.includes(centerLetter)) return false;
-    return [...word].every((c) => letterSet.has(c));
-  });
+  // Efficient: only traverses branches with valid letters
+  const candidateWords = trie.findByLetters(letterSet, 4);
+  // Filter for center letter (can't prune this during traversal without knowing center)
+  return candidateWords.filter((word) => word.includes(centerLetter));
 };
 
 /**
