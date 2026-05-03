@@ -8,6 +8,7 @@ import mongoose, { Schema, type Document } from "mongoose";
  */
 
 export interface IPuzzle extends Document {
+  id: string;
   letters: string[];
   centerLetter: string;
   totalWords: number;
@@ -20,6 +21,7 @@ export interface IPuzzle extends Document {
 
 const puzzleSchema = new Schema<IPuzzle>(
   {
+    id: { type: String, required: true, unique: true },
     letters: {
       type: [String],
       required: true,
