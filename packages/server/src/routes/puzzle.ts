@@ -82,9 +82,9 @@ router.post("/submit", async (req, res, next) => {
 
     // Get existing score to check already-found words
     const existingScore = await getUserScore("anonymous", puzzleId);
-    const foundWords = existingScore?.words.map((w) => w.word) ?? [];
+    const foundWordStrings = existingScore?.words.map((w) => w.word) ?? [];
 
-    const result = validateSubmission(word, puzzle as unknown as Puzzle, foundWords, "medium");
+    const result = validateSubmission(word, puzzle as unknown as Puzzle, foundWordStrings, "medium");
 
     if (!result.valid) {
       // Return error response (success: false) so client can handle it properly
@@ -92,9 +92,10 @@ router.post("/submit", async (req, res, next) => {
       return;
     }
 
-    // Add word to score
+    // Preserve existing words with their scores, add the new word
+    const existingWords = existingScore?.words ?? [];
     const updatedWords = [
-      ...foundWords.map((w) => ({ word: w, points: 0, isPangram: false })), // Placeholder
+      ...existingWords.map((w) => ({ word: w.word, points: w.points, isPangram: w.isPangram })),
       { word: result.word, points: result.points, isPangram: result.isPangram },
     ];
 
