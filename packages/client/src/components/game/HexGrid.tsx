@@ -22,7 +22,7 @@ interface HexGridProps {
 }
 
 /** Hexagon size (radius from center to vertex) — reduced to avoid overlap */
-const HEX_SIZE = 36;
+const HEX_SIZE = 30;
 
 /**
  * Generates SVG path for a flat-top hexagon.
@@ -41,17 +41,16 @@ const hexPath = (cx: number, cy: number, size: number): string => {
 /**
  * 2-3-2 honeycomb positions.
  *
- * For flat-top hexagons:
- * - Width = 2 * size
- * - Height = sqrt(3) * size
- * - Horizontal center-to-center = 1.5 * size (they overlap by 0.5 * size)
- * - Vertical row spacing = 0.75 * sqrt(3) * size (edges touch)
+ * For flat-top hexagons where edges just touch:
+ * - Center-to-center distance = 2 * size
+ * - Horizontal spacing in same row = 2 * size
+ * - Vertical spacing between rows = sqrt(3) * size
  *
  * Positions calculated with center of the whole grid at (150, 130).
  */
 const getHexPositions = (): Array<{ x: number; y: number }> => {
-  const w = 1.5 * HEX_SIZE; // horizontal center-to-center
-  const h = Math.sqrt(3) * HEX_SIZE * 0.75; // vertical row spacing
+  const w = 2 * HEX_SIZE; // horizontal center-to-center (edge to edge)
+  const h = Math.sqrt(3) * HEX_SIZE; // vertical row spacing
 
   const cx = 150;
   const cy = 120;
