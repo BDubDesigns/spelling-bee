@@ -61,16 +61,18 @@ body {
   text-transform: uppercase;
 }
 
-/* Hexagon hover effect */
+/* Hexagon hover effect — scale from center */
 .hex-cell {
   transition: transform 0.15s ease, filter 0.15s ease;
   cursor: pointer;
   user-select: none;
+  transform-box: fill-box;
+  transform-origin: center center;
 }
 
 .hex-cell:hover {
-  transform: scale(1.08);
-  filter: brightness(1.05);
+  transform: scale(1.1);
+  filter: brightness(1.08);
 }
 
 .hex-cell:active {

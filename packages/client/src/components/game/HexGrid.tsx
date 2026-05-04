@@ -21,8 +21,8 @@ interface HexGridProps {
   onLetterClick: (letter: string) => void;
 }
 
-/** Hexagon size (radius from center to vertex) */
-const HEX_SIZE = 44;
+/** Hexagon size (radius from center to vertex) — reduced to avoid overlap */
+const HEX_SIZE = 36;
 
 /**
  * Generates SVG path for a flat-top hexagon.
