@@ -5,6 +5,10 @@ import { clsx } from "clsx";
  *
  * Displays the 7 puzzle letters in a honeycomb pattern with the
  * center letter highlighted. Clicking a letter adds it to the word.
+ *
+ * Uses flat-top hexagons with proper honeycomb geometry:
+ * - Center-to-center distance = sqrt(3) * size
+ * - Surrounding hexes at 60-degree intervals
  */
 
 interface HexGridProps {
@@ -16,36 +20,54 @@ interface HexGridProps {
   onLetterClick: (letter: string) => void;
 }
 
+/** Hexagon size (radius from center to vertex) */
+const HEX_SIZE = 44;
+
+/** Center of the honeycomb in SVG coordinates */
+const CENTER_X = 150;
+const CENTER_Y = 130;
+
 /**
- * SVG hexagon path for a flat-top hexagon.
- *
- * @param cx - Center X coordinate
- * @param cy - Center Y coordinate
- * @param size - Radius of the hexagon
+ * Generates SVG path for a flat-top hexagon.
+ * Flat-top means the top edge is horizontal.
  */
 const hexPath = (cx: number, cy: number, size: number): string => {
   const points: string[] = [];
   for (let i = 0; i < 6; i++) {
+    // Flat-top: start at -30 degrees (top-right vertex)
     const angle = (Math.PI / 3) * i - Math.PI / 6;
     const x = cx + size * Math.cos(angle);
     const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
+    points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
   }
   return `M ${points.join(" L ")} Z`;
 };
 
-/** Hexagon cell positions for honeycomb layout (center + 6 surrounding) */
-const HEX_POSITIONS = [
-  { x: 150, y: 130 }, // center
-  { x: 150, y: 30 }, // top
-  { x: 237, y: 80 }, // top-right
-  { x: 237, y: 180 }, // bottom-right
-  { x: 150, y: 230 }, // bottom
-  { x: 63, y: 180 }, // bottom-left
-  { x: 63, y: 80 }, // top-left
-];
+/**
+ * Calculates positions for 7 hexagons in a honeycomb pattern.
+ * The 6 surrounding hexes are placed at 60-degree intervals
+ * at a distance of sqrt(3) * size from center.
+ */
+const getHexPositions = (): Array<{ x: number; y: number }> => {
+  const positions: Array<{ x: number; y: number }> = [{ x: CENTER_X, y: CENTER_Y }];
 
-const HEX_SIZE = 42;
+  // Distance from center to surrounding hex centers
+  const dist = Math.sqrt(3) * HEX_SIZE;
+
+  // 6 surrounding hexes at 60-degree intervals
+  // Starting from top (270°) and going clockwise
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 3) * i - Math.PI / 2; // Start at top
+    positions.push({
+      x: CENTER_X + dist * Math.cos(angle),
+      y: CENTER_Y + dist * Math.sin(angle),
+    });
+  }
+
+  return positions;
+};
+
+const HEX_POSITIONS = getHexPositions();
 
 export const HexGrid = ({ letters, centerLetter, onLetterClick }: HexGridProps): React.JSX.Element => {
   /** Reorder letters so center is first */
@@ -54,8 +76,16 @@ export const HexGrid = ({ letters, centerLetter, onLetterClick }: HexGridProps):
     ...letters.filter((l) => l !== centerLetter),
   ];
 
+  /** Calculate viewBox to fit all hexagons with padding */
+  const padding = HEX_SIZE + 10;
+  const minX = CENTER_X - Math.sqrt(3) * HEX_SIZE - padding;
+  const maxX = CENTER_X + Math.sqrt(3) * HEX_SIZE + padding;
+  const minY = CENTER_Y - Math.sqrt(3) * HEX_SIZE - padding;
+  const maxY = CENTER_Y + Math.sqrt(3) * HEX_SIZE + padding;
+  const viewBox = `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}`;
+
   return (
-    <svg viewBox="0 0 300 260" className="w-full max-w-xs mx-auto select-none">
+    <svg viewBox={viewBox} className="w-full max-w-xs mx-auto select-none">
       {orderedLetters.map((letter, index) => {
         const pos = HEX_POSITIONS[index];
         if (!pos) return null;
