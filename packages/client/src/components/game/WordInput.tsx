@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { clsx } from "clsx";
 import type { Feedback } from "@/stores";
 
@@ -23,6 +23,9 @@ export const WordInput = ({
   feedback,
   onKeyPress,
 }: WordInputProps): React.JSX.Element => {
+  /** Key to force animation replay on new feedback */
+  const [feedbackKey, setFeedbackKey] = useState(0);
+
   /** Listen for keyboard events */
   const handleKeyDown = useCallback(
     (e: KeyboardEvent): void => {
@@ -36,8 +39,15 @@ export const WordInput = ({
     return (): void => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  /** Increment key when feedback changes to replay animation */
+  useEffect(() => {
+    if (feedback) {
+      setFeedbackKey((k) => k + 1);
+    }
+  }, [feedback]);
+
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 h-20 justify-start">
       {/* Current word display */}
       <div className="game-input text-3xl font-bold h-12 flex items-center justify-center">
         {currentWord.split("").map((letter, index) => (
@@ -56,11 +66,12 @@ export const WordInput = ({
         )}
       </div>
 
-      {/* Feedback message */}
+      {/* Feedback message with float-up animation */}
       {feedback && (
         <div
+          key={feedbackKey}
           className={clsx(
-            "text-sm font-medium px-3 py-1 rounded-full animate-fade-in",
+            "text-sm font-bold px-4 py-1.5 rounded-full feedback-pop",
             feedback.type === "success" && "bg-green-100 text-green-700",
             feedback.type === "pangram" && "bg-amber-100 text-amber-700",
             feedback.type === "error" && "bg-red-100 text-red-700 word-error",

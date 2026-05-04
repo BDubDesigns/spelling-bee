@@ -90,9 +90,9 @@ export const useGame = () => {
       });
 
       if (data.result.isPangram) {
-        showTimedFeedback("pangram", `Pangram! +${data.result.points}`);
+        showTimedFeedback("pangram", `${data.result.word} — Pangram! +${data.result.points}`);
       } else {
-        showTimedFeedback("success", `+${data.result.points}`);
+        showTimedFeedback("success", `${data.result.word} +${data.result.points}`);
       }
     } catch (err: unknown) {
       // Extract the error message from the API response

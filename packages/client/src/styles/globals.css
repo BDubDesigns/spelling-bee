@@ -82,6 +82,17 @@ body {
   animation: pop 0.3s ease-out;
 }
 
+/* Feedback pop animation — more prominent */
+.feedback-pop {
+  animation: feedback-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes feedback-pop {
+  0% { transform: scale(0.5) translateY(8px); opacity: 0; }
+  60% { transform: scale(1.15) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 /* Error shake animation */
 .word-error {
   animation: shake 0.5s ease-in-out;
