@@ -11,3 +11,4 @@ export * from "./score";
 export * from "./leaderboard";
 export * from "./social";
 export * from "./api";
+export * from "./multiplayer";

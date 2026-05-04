@@ -3,17 +3,19 @@ import { clsx } from "clsx";
 import { Layout } from "@/components/layout";
 import { HexGrid, WordInput, ScoreDisplay, FoundWords } from "@/components/game";
 import { Leaderboard, FriendsList, InviteModal } from "@/components/social";
+import { MultiplayerLobby, SpeedRound, Results } from "@/components/multiplayer";
 import { useGame } from "@/hooks";
+import { useMultiplayerStore } from "@/stores/multiplayer";
 
 /** Tab identifiers */
-type Tab = "game" | "leaderboard" | "friends";
+type Tab = "game" | "multiplayer" | "leaderboard" | "friends";
 
 /**
  * Root application component.
  *
  * Wires together the game state, hex grid, word input,
  * score display, and found words list. Includes tabs for
- * leaderboard and friends features.
+ * multiplayer, leaderboard, and friends features.
  */
 export const App = (): React.JSX.Element => {
   const [activeTab, setActiveTab] = useState<Tab>("game");
@@ -33,6 +35,8 @@ export const App = (): React.JSX.Element => {
     handleKeyPress,
   } = useGame();
 
+  const { phase: mpPhase } = useMultiplayerStore();
+
   if (isLoading || !puzzle) {
     return (
       <Layout>
@@ -50,6 +54,7 @@ export const App = (): React.JSX.Element => {
         {(
           [
             { id: "game" as const, label: "Game" },
+            { id: "multiplayer" as const, label: "Speed Round" },
             { id: "leaderboard" as const, label: "Leaderboard" },
             { id: "friends" as const, label: "Friends" },
           ] as const
@@ -139,6 +144,33 @@ export const App = (): React.JSX.Element => {
           {/* Found words */}
           <FoundWords words={foundWords} />
         </div>
+      )}
+
+      {/* Multiplayer */}
+      {activeTab === "multiplayer" && (
+        <>
+          {mpPhase === "menu" && <MultiplayerLobby />}
+          {mpPhase === "queued" && (
+            <div className="flex flex-col items-center gap-4 py-8">
+              <div className="text-lg text-muted">Searching for opponent...</div>
+              <div className="animate-pulse text-2xl">...</div>
+              <button
+                onClick={() => useMultiplayerStore.getState().reset()}
+                className="px-4 py-2 text-sm font-medium text-muted hover:text-bee-brown transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+          {(mpPhase === "matched" || mpPhase === "countdown") && (
+            <div className="flex flex-col items-center gap-4 py-8">
+              <div className="text-lg font-bold text-bee-brown">Match Found!</div>
+              <div className="animate-pulse text-xl text-muted">Starting soon...</div>
+            </div>
+          )}
+          {mpPhase === "playing" && <SpeedRound />}
+          {mpPhase === "results" && <Results />}
+        </>
       )}
 
       {activeTab === "leaderboard" && <Leaderboard />}

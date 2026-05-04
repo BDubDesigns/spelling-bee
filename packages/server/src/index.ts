@@ -2,19 +2,33 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import mongoose from "mongoose";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { config } from "@/config";
 import { errorHandler } from "@/middleware";
 import { puzzleRouter, leaderboardRouter, socialRouter } from "@/routes";
 import { loadAllDictionaries } from "@/services";
+import { initSocketHandlers } from "@/socket/handlers";
 
 /**
  * Spelling Bee Server
  *
- * Express API server that handles puzzle generation, word validation,
- * scoring, leaderboards, and social features.
+ * Express API server with Socket.IO for multiplayer.
+ * Handles puzzle generation, word validation, scoring,
+ * leaderboards, social features, and real-time games.
  */
 
 const app = express();
+const httpServer = createServer(app);
+
+/** Socket.IO server with CORS configuration */
+const io = new Server(httpServer, {
+  cors: {
+    origin: config.cors.origin,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 /** Security middleware */
 app.use(helmet());
@@ -47,7 +61,7 @@ app.use(errorHandler);
  * Starts the server.
  *
  * Connects to MongoDB, loads all dictionaries into memory,
- * then starts listening for requests.
+ * initializes Socket.IO handlers, then starts listening.
  */
 const start = async (): Promise<void> => {
   try {
@@ -59,8 +73,12 @@ const start = async (): Promise<void> => {
     // Load all dictionaries into memory (trie)
     loadAllDictionaries();
 
+    // Initialize Socket.IO handlers
+    initSocketHandlers(io);
+    console.log("Socket.IO initialized");
+
     // Start the server
-    app.listen(config.port, () => {
+    httpServer.listen(config.port, () => {
       console.log(`Spelling Bee server running on port ${config.port}`);
       console.log(`Environment: ${config.nodeEnv}`);
     });

@@ -30,6 +30,10 @@ export type {
   ApiSuccessResponse,
   ApiErrorResponse,
   ApiResponse,
+  GameStatus,
+  MultiplayerPlayer,
+  GameRoom,
+  GameResult,
 } from "../schemas/index";
 
 export { DEFAULT_RANK_THRESHOLDS, createSuccessResponse, createErrorResponse } from "../schemas/index";
