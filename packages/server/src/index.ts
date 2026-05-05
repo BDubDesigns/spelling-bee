@@ -7,7 +7,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { config } from "@/config";
 import { errorHandler } from "@/middleware";
-import { puzzleRouter, leaderboardRouter, socialRouter } from "@/routes";
+import { puzzleRouter, leaderboardRouter, socialRouter, webhookRouter } from "@/routes";
 import { loadAllDictionaries } from "@/services";
 import { initSocketHandlers } from "@/socket/handlers";
 
@@ -54,6 +54,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/puzzle", puzzleRouter);
 app.use("/api/leaderboard", leaderboardRouter);
 app.use("/api/social", socialRouter);
+app.use("/api/webhooks", webhookRouter);
 
 /** Centralized error handler (must be last) */
 app.use(errorHandler);
