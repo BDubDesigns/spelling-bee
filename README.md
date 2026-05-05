@@ -123,17 +123,30 @@ The application is designed to be deployed as a single Docker container:
 docker compose up --build
 ```
 
-### Coolify (Self-hosted)
+### Coolify (Self-hosted on Hetzner VPS)
 
-For production deployment on a VPS with Coolify:
+1. **Push to GitHub** — ensure all changes are committed and pushed
 
-1. Push to your Git repository
-2. Connect Coolify to your repository
-3. Set the following environment variables in Coolify:
-   - `CLERK_PUBLISHABLE_KEY`
-   - `CLERK_SECRET_KEY`
-   - `MONGODB_URI`
-4. Deploy
+2. **In Coolify:**
+   - Create a new application
+   - Connect your GitHub repository
+   - Choose "Docker Compose" as the build pack
+   - Set the following environment variables:
+     ```
+     MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/spelling-bee?retryWrites=true&w=majority
+     CLERK_PUBLISHABLE_KEY=pk_live_...
+     CLERK_SECRET_KEY=sk_live_...
+     ```
+   - Deploy
+
+3. **In Clerk Dashboard:**
+   - Add your production domain to allowed origins
+   - Create a webhook endpoint: `https://your-domain.com/api/webhooks/clerk`
+   - Subscribe to events: `user.created`, `user.updated`, `user.deleted`
+
+4. **In MongoDB Atlas:**
+   - Whitelist your server's IP address
+   - Or allow access from anywhere (for simplicity)
 
 ### Manual Deployment
 

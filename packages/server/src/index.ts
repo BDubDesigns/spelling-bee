@@ -5,6 +5,7 @@ import helmet from "helmet";
 import mongoose from "mongoose";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { join } from "path";
 import { config } from "@/config";
 import { errorHandler } from "@/middleware";
 import { puzzleRouter, leaderboardRouter, socialRouter, webhookRouter } from "@/routes";
@@ -55,6 +56,15 @@ app.use("/api/puzzle", puzzleRouter);
 app.use("/api/leaderboard", leaderboardRouter);
 app.use("/api/social", socialRouter);
 app.use("/api/webhooks", webhookRouter);
+
+/** Serve client static files in production */
+if (config.isProduction) {
+  const clientDist = join(__dirname, "../../client/dist");
+  app.use(express.static(clientDist));
+  app.get("*", (_req, res) => {
+    res.sendFile(join(clientDist, "index.html"));
+  });
+}
 
 /** Centralized error handler (must be last) */
 app.use(errorHandler);
