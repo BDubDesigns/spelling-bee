@@ -17,6 +17,7 @@
     "@clerk/express": "^1.6.0",
     "@spelling-bee/shared": "*",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",

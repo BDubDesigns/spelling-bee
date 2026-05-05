@@ -1,3 +1,4 @@
+import "./env"; // Must be first — loads .env before other imports
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";

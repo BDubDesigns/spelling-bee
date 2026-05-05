@@ -10,9 +10,6 @@ import type { WordValidationResult, Puzzle } from "@spelling-bee/shared";
  * Puzzles are generated deterministically from a seed (date string or random).
  */
 
-/** Letters that commonly appear in English words (for better puzzles) */
-const COMMON_LETTERS = "etaoinsrhldcumfpgwybvkxjqz".split("");
-
 /**
  * Simple seeded PRNG (mulberry32).
  * Returns a function that produces deterministic pseudo-random numbers.
@@ -42,6 +39,9 @@ const hashString = (str: string): number => {
 /**
  * Selects 7 unique letters that form at least one pangram.
  *
+ * Strategy: Find a pangram (word with 7 unique letters) in the dictionary,
+ * then use its letters as the puzzle set. This guarantees a valid puzzle.
+ *
  * @param rng - Seeded random number generator
  * @param trie - Dictionary trie to validate pangrams exist
  * @returns Object with letters array and center letter
@@ -50,44 +50,34 @@ const selectLetters = (
   rng: () => number,
   trie: ReturnType<typeof getDictionary>,
 ): { letters: string[]; centerLetter: string } => {
-  const maxAttempts = 100;
+  // Get all words and find pangrams (7 unique letters)
+  const allWords = trie.findByPrefix("");
+  const pangrams = allWords.filter(
+    (w) => w.length >= 7 && new Set(w).size === 7,
+  );
 
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    // Pick 7 unique letters, weighted toward common ones
-    const pool = [...COMMON_LETTERS];
-    const selected: string[] = [];
-
-    for (let i = 0; i < 7; i++) {
-      const idx = Math.floor(rng() * pool.length);
-      const letter = pool[idx];
-      if (letter) {
-        selected.push(letter);
-      }
-      pool.splice(idx, 1);
-    }
-
-    // Verify at least one pangram exists using these letters
-    const letterSet = new Set(selected);
-    const candidateWords = trie.findByLetters(letterSet, 7);
-    const pangrams = candidateWords.filter(
-      (w) => new Set(w).size === 7,
-    );
-
-    if (pangrams.length > 0 && selected.length === 7) {
-      // Center letter should be common enough to appear in many words
-      const centerIdx = Math.floor(rng() * 7);
-      const centerLetter = selected[centerIdx];
-      if (centerLetter) {
-        return {
-          letters: selected,
-          centerLetter,
-        };
-      }
-    }
+  if (pangrams.length === 0) {
+    throw new Error("No pangrams found in dictionary");
   }
 
-  // Fallback — shouldn't happen with good dictionaries
-  throw new Error("Could not generate valid puzzle after max attempts");
+  // Pick a random pangram
+  const pangramIdx = Math.floor(rng() * pangrams.length);
+  const pangram = pangrams[pangramIdx];
+  if (!pangram) {
+    throw new Error("Failed to select pangram");
+  }
+
+  // Extract the 7 unique letters
+  const letters = [...new Set(pangram)];
+
+  // Pick a center letter (prefer common letters that appear in many words)
+  const centerIdx = Math.floor(rng() * letters.length);
+  const centerLetter = letters[centerIdx];
+  if (!centerLetter) {
+    throw new Error("Failed to select center letter");
+  }
+
+  return { letters, centerLetter };
 };
 
 /**
