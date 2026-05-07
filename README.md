@@ -64,9 +64,9 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your Clerk and MongoDB credentials
+# Edit .env with your credentials (see below)
 
-# Start development servers
+# Start development
 npm run dev
 ```
 
@@ -75,28 +75,26 @@ npm run dev
 Create a `.env` file in the root directory:
 
 ```env
-# Clerk (server)
+# MongoDB Atlas
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/spelling-bee?retryWrites=true&w=majority&appName=spelling-bee
+
+# Server port
+PORT=3001
+
+# Client dev server port
+VITE_PORT=5173
+
+# Clerk authentication
 CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
-
-# MongoDB
-MONGODB_URI=mongodb+srv://...
-
-# Server
-PORT=3000
 ```
 
-Create a `packages/client/.env` file:
-
-```env
-# Clerk (client)
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-```
+The client reads `VITE_CLERK_PUBLISHABLE_KEY` from `packages/client/.env` (created automatically from root `.env`).
 
 ## Development
 
 ```bash
-# Start all services in development mode
+# Start all services (shared, server, client)
 npm run dev
 
 # Run type checking across all packages
@@ -108,9 +106,19 @@ npm run lint
 # Run tests across all packages
 npm run test
 
-# Build all packages
+# Build all packages for production
 npm run build
 ```
+
+**What `npm run dev` starts:**
+
+| Package | Description | Default Port |
+|---------|-------------|--------------|
+| `shared` | Watches for type changes | — |
+| `server` | Express API + Socket.IO | `PORT` (3001) |
+| `client` | Vite dev server with HMR | `VITE_PORT` (5173) |
+
+The client proxies API requests to the server automatically.
 
 ## Deployment
 
@@ -133,7 +141,7 @@ docker compose up --build
    - Choose "Docker Compose" as the build pack
    - Set the following environment variables:
      ```
-     MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/spelling-bee?retryWrites=true&w=majority
+     MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/spelling-bee-prod?retryWrites=true&w=majority
      CLERK_PUBLISHABLE_KEY=pk_live_...
      CLERK_SECRET_KEY=sk_live_...
      ```
@@ -180,8 +188,10 @@ The word list is generated from [SCOWL](https://github.com/en-wl/wordlist) (Spel
 The dictionaries are committed to the repository for reproducibility. To regenerate:
 
 ```bash
-# Clone SCOWL to c:\opencode\scowl\
-# Then run the build script
+# Clone SCOWL to a sibling directory
+git clone https://github.com/en-wl/wordlist.git ../scowl
+
+# Run the build script
 python -X utf8 scripts/generate-dictionaries.py
 ```
 
@@ -199,6 +209,7 @@ python -X utf8 scripts/generate-dictionaries.py
 | GET | `/api/social/requests` | Get pending friend requests |
 | POST | `/api/social/request` | Send a friend request |
 | POST | `/api/social/respond` | Accept/decline a friend request |
+| POST | `/api/webhooks/clerk` | Clerk webhook for user sync |
 
 ## License
 
